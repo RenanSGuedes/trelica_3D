@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import numpy as np
+from PIL import Image
 from sympy import pi, symbols
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -74,6 +75,19 @@ for i in range(int(len(rows))):
     cteLs.append(cteL)
     cteMs.append(cteM)
     cteNs.append(cteN)
+
+with st.sidebar.expander("Exemplos"):
+    st.text('Básico')
+    image = Image.open('./images/estrutura_2.png')
+    st.image(image, use_column_width=True)
+    with open('./csv_files/estrutura_3D_14.csv', 'rb') as f:
+        st.download_button('Baixar', f, file_name='estrutura_3D_14.csv')
+
+    st.text('Tensões')
+    image = Image.open('./images/estrutura_11.png')
+    st.image(image, use_column_width=True)
+    with open('./csv_files/estrutura_3D_4.csv', 'rb') as f:
+        st.download_button('Baixar', f, file_name='estrutura_3D_4.csv')
 
 col1, col2 = st.columns(2)
 
