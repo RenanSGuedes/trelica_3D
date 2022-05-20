@@ -1,4 +1,4 @@
-# import pandas as pd
+import pandas as pd
 import streamlit as st
 import numpy as np
 from sympy import pi, symbols
@@ -17,12 +17,19 @@ xp1s, yp1s, zp1s, xp2s, yp2s, zp2s = [], [], [], [], [], []
 
 cteLs, cteMs, cteNs = [], [], []
 
-pandasToPythonList = [
-    [1, 0, 0, 0, 1, 2, 100000000, .1],
-    [1, 0, 0, 0, 0, 2, 100000000, .1],
-    [1, 0, 0, 1, 0, 2, 100000000, .1],
-    [1, 0, 0, 0, 0, 0, 100000000, .1]
-]
+uploaded_file = st.file_uploader("Escolha um arquivo")
+if uploaded_file is not None:
+    # To read file as bytes:
+    bytes_data = uploaded_file.getvalue()
+
+
+# Can be used wherever a "file-like" object is accepted:
+@st.cache(suppress_st_warning=True)
+def readCSVFile(file):
+    return pd.read_csv(file)
+
+
+pandasToPythonList = readCSVFile(uploaded_file).values.tolist()
 
 for row in pandasToPythonList:
     rows.append(row)
@@ -63,7 +70,7 @@ for i in range(int(len(rows))):
     cteN = (zp2s[i] - zp1s[i]) / comprimento
 
     Ls.append(comprimento)
-    As.append(D**2)
+    As.append(D ** 2)
     cteLs.append(cteL)
     cteMs.append(cteM)
     cteNs.append(cteN)
@@ -250,7 +257,7 @@ for i in range(len(listaGlobal)):
 
 listaGlobalNumpy = np.array(listaGlobal)
 
-with st.expander("Matriz de rigidez global"):
+with st.expander("Matriz de rigidez global ({} x {})".format(3 * len(points), 3 * len(points))):
     st.write(listaGlobalNumpy)
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -260,7 +267,7 @@ n_elementos_matriz_de_forcas = 3 * len(pontoNo)
 forcas = []
 
 for i in range(len(pontoNo)):
-    with st.expander("Nó {}".format(i + 1)):
+    with st.sidebar.expander("Nó {}".format(i + 1)):
         resposta = st.radio(
             "Quais as restrições?",
             ('X', 'Y', 'Z', 'XY', 'XZ', 'YZ', 'XYZ', 'L'),
@@ -305,40 +312,38 @@ for i in range(len(pontoNo)):
                 )
                 forcas.append(['{}{}'.format(n, i + 1), nova_resposta])
 
-
-st.write("new_forcas", forcas)
+# st.write("new_forcas", forcas)
 forcasFiltradoComUeV = []
 forcasFiltrado = []
-
 
 for i in range(int(len(forcas))):
     if type(forcas[i][1]) == float or type(forcas[i][1]) == int:
         forcasFiltradoComUeV.append(forcas[i])
 
-st.write("forcasFiltradoComUeV", forcasFiltradoComUeV)
+# st.write("forcasFiltradoComUeV", forcasFiltradoComUeV)
 
 for i in range(int(len(forcas))):
     if type(forcas[i][1]) == float or type(forcas[i][1]) == int:
         forcasFiltrado.append(forcas[i][1])
 
-st.write("forcasFiltrado", forcasFiltrado)
+# st.write("forcasFiltrado", forcasFiltrado)
 ccs = []
 
 for item in forcas:
     if item[1] == 'R':
         ccs.append(forcas.index(item))
 
-st.write("ccs", ccs)
+# st.write("ccs", ccs)
 a = np.delete(listaGlobalNumpy, ccs, axis=1)
 a = np.delete(a, ccs, axis=0)
 
-st.write("a", a)
-st.write("forcas", forcas)
+# st.write("a", a)
+# st.write("forcas", forcas)
 
 numpyListInverse = np.linalg.inv(a)
 
 deslocamentosNumpy = np.matmul(numpyListInverse, forcasFiltrado)
-st.write("deslocamentosNumpy", deslocamentosNumpy)
+# st.write("deslocamentosNumpy", deslocamentosNumpy)
 
 deslocamentosArray = deslocamentosNumpy.tolist()
 deslocamentosComUeV = []
@@ -346,7 +351,7 @@ deslocamentosComUeV = []
 for i in range(len(forcasFiltradoComUeV)):
     deslocamentosComUeV.append(('{}'.format(forcasFiltradoComUeV[i][0]), deslocamentosArray[i]))
 
-st.write("deslocamentosComUeV", deslocamentosComUeV)
+# st.write("deslocamentosComUeV", deslocamentosComUeV)
 
 for i in range(len(forcas)):
     for j in range(len(deslocamentosComUeV)):
@@ -355,24 +360,31 @@ for i in range(len(forcas)):
         elif forcas[i][0] == deslocamentosComUeV[j][0]:
             forcas[i][1] = deslocamentosComUeV[j][1]
 
-st.write("forcas (deslocamentos)", forcas)
+# st.write("forcas (deslocamentos)", forcas)
 for i in range(0, len(forcas), 1):
     del forcas[i][0]
 
 deslocamentosAgrupados = []
 
 for (i, j) in zip(range(0, len(forcas), 3), range(len(forcas))):
-    deslocamentosAgrupados.append([j + 1, forcas[i][0], forcas[i + 1][0]])
+    deslocamentosAgrupados.append([j + 1, forcas[i][0], forcas[i + 1][0], forcas[i + 2][0]])
 
 col1, col2 = st.columns(2)
 
 containerDeslocamentos = st.container()
 
+deslocamentosAgrupadosTabela = []
 with containerDeslocamentos.expander("Deslocamentos"):
+    deslocamentosAgrupadosTabela.append(["Nó", "u (m)", "v (m)", "w (m)"])
     for i in range(len(deslocamentosAgrupados)):
-        st.subheader("Nó {}".format(i + 1))
-        st.write("u{}: {} m".format(i + 1, format(deslocamentosAgrupados[i][1], ".8f")))
-        st.write("v{}: {} m".format(i + 1, format(deslocamentosAgrupados[i][2], ".8f")))
+        deslocamentosAgrupadosTabela.append(
+            ["Nó {}".format(i + 1),
+             format(deslocamentosAgrupados[i][1], ".4f"),
+             format(deslocamentosAgrupados[i][2], ".4f"),
+             format(deslocamentosAgrupados[i][3], ".4f")
+             ]
+        )
+    st.write(np.array(deslocamentosAgrupadosTabela))
 
 newElements = copy.deepcopy(elementsComNos)
 
@@ -383,7 +395,7 @@ for i in range(len(newElements)):
                 newElements[i][k][1] += deslocamentosAgrupados[j][1]
                 newElements[i][k][2] += deslocamentosAgrupados[j][2]
 
-st.write("newElements", newElements)
+# st.write("newElements", newElements)
 
 # Deleta os índices da primeira posição usados como referência
 for i in range(len(newElements)):
@@ -404,15 +416,37 @@ for i in range(len(novoComprimento)):
     epsilon = (novoComprimento[i] - Ls[i]) / Ls[i]
     deformacoes.append(epsilon)
 
+deformacoesTabela = []
+with st.expander("Deformações"):
+    deformacoesTabela.append(["Elemento", "%"])
+    for i in range(len(deformacoes)):
+        deformacoesTabela.append(["Elemento {}".format(i + 1),
+                                  format(deformacoes[i] * 100,
+                                         '.{}f'.format(4))
+                                  ])
+
+    st.write(np.array(deformacoesTabela))
+
 tensoes = []
 
 for i in range(len(deformacoes)):
     sigma = Es[i] * deformacoes[i]
     tensoes.append(sigma)
 
+tensoesTabela = []
+with st.expander("Tensões"):
+    tensoesTabela.append(["Elemento", "MPa"])
+    for i in range(len(tensoes)):
+        tensoesTabela.append(["Elemento {}".format(i + 1),
+                              format(tensoes[i] * 10**(-6),
+                                     '.{}f'.format(4))
+                              ])
+
+    st.write(np.array(tensoesTabela))
+
 newPointsWithRep = copy.deepcopy(newElements)
 
-st.write("newPointsWithRep", newPointsWithRep)
+# st.write("newPointsWithRep", newPointsWithRep)
 newPoints = []
 
 for i in range(len(newPointsWithRep)):
@@ -420,13 +454,13 @@ for i in range(len(newPointsWithRep)):
         if newPointsWithRep[i][j] not in newPoints:
             newPoints.append(newPointsWithRep[i][j])
 
-st.write("elements", elements)
-st.write("points", points)
+# st.write("elements", elements)
+# st.write("points", points)
 # Tensão nos elementos
 
 # ----------------------------------------------------------------------------------------------------
 
-st.write("newPoints", newPoints)
+# st.write("newPoints", newPoints)
 with st.expander("Gráfico"):
     fig = plt.figure(facecolor='white')
     ax = fig.add_subplot(111, projection="3d")
@@ -509,7 +543,7 @@ with st.expander("Gráfico"):
 
     if numerar:
         for i in range(len(pontoNo)):
-            ax.text(pontoNo[i][0] + .2, pontoNo[i][1] + .2, pontoNo[i][2] + .2,
+            ax.text(pontoNo[i][0] + .3, pontoNo[i][1] + .3, pontoNo[i][2] + .3,
                     "{}".format(i + 1), color='black', ha='left', va='top', size=6)
 
     # Numerando os elementos
