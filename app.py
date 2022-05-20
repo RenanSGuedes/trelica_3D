@@ -18,10 +18,10 @@ xp1s, yp1s, zp1s, xp2s, yp2s, zp2s = [], [], [], [], [], []
 cteLs, cteMs, cteNs = [], [], []
 
 pandasToPythonList = [
-    [1, 0, 0, 0, 1, 2, 1000000, 1],
-    [1, 0, 0, 0, 0, 2, 1000000, 1],
-    [1, 0, 0, 1, 0, 2, 1000000, 1],
-    [1, 0, 0, 0, 0, 0, 1000000, 1]
+    [1, 0, 0, 0, 1, 2, 100000000, .1],
+    [1, 0, 0, 0, 0, 2, 100000000, .1],
+    [1, 0, 0, 1, 0, 2, 100000000, .1],
+    [1, 0, 0, 0, 0, 0, 100000000, .1]
 ]
 
 for row in pandasToPythonList:
@@ -51,7 +51,7 @@ for i in range(int(len(rows))):
     if [xp1, yp1, zp1] not in points:
         points.append([xp1, yp1, zp1])
     if [xp2, yp2, zp2] not in points:
-        points.append([xp2, yp2, zp1])
+        points.append([xp2, yp2, zp2])
 
     elements.append([[float(xp1), float(yp1), float(zp1)], [float(xp2), float(yp2), float(zp2)]])
     comprimento = ((float(xp2) - float(xp1)) ** 2 +
@@ -68,8 +68,57 @@ for i in range(int(len(rows))):
     cteMs.append(cteM)
     cteNs.append(cteN)
 
+col1, col2 = st.columns(2)
 
-st.write(As)
+fig = plt.figure(facecolor='white')
+ax = fig.add_subplot(111, projection="3d")
+
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.set_zlabel("z")
+
+colA, colB, colC, colD, colE = st.columns(5)
+
+with colA:
+    color_estrutura = st.color_picker('Estrutura', '#7159c1', key=33)
+with colB:
+    background_color = st.color_picker("Background", '#7159c1', key=44)
+with colC:
+    edge_color = st.color_picker("Cantos", '#7159c1', key=55)
+with colD:
+    axes_color = st.color_picker("Eixos", '#ff5f5f', key=66)
+with colE:
+    points_color = st.color_picker("Nós", '#ff5f5f', key=77)
+
+with col1:
+    st.header("Vista geral")
+    st.write("A estrutura mostrada apresenta {} nós e {} elementos".format(len(points), len(elements)))
+
+    elevation = st.slider('Elevação', 0, 180, 40)
+    azimuth = st.slider('Azimute', 0, 360, 225)
+with col2:
+    for i in range(len(elements)):
+        xs, ys, zs = zip(elements[i][0], elements[i][1])
+        ax.plot(xs, ys, zs, color=color_estrutura, linewidth=2)
+
+    for i in range(len(points)):
+        ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], color=points_color, s=12)
+
+        ax.xaxis.pane.set_edgecolor(edge_color)
+        ax.yaxis.pane.set_edgecolor(edge_color)
+        ax.zaxis.pane.set_edgecolor(edge_color)
+        ax.set_facecolor(background_color)
+
+        ax.xaxis.label.set_color(axes_color)  # setting up X-axis label color to yellow
+        ax.yaxis.label.set_color(axes_color)
+        ax.zaxis.label.set_color(axes_color)
+
+        ax.tick_params(axis='x', colors=axes_color)  # setting up X-axis tick color to red
+        ax.tick_params(axis='y', colors=axes_color)
+        ax.tick_params(axis='z', colors=axes_color)
+
+        ax.view_init(elevation, azimuth)
+    st.pyplot(fig)
 # -------------------------------------------------------------------------------------------
 with st.sidebar.expander("Propriedades dos elementos"):
     if st.checkbox("Diâmetro"):
@@ -121,8 +170,8 @@ for i in range(len(elements)):
                 indicesElementos[i][j] = pontoNoAgrupado[k][1]
 
 for i in range(len(indicesElementos)):
-    elementsComNos.append([[indicesElementos[i][0], elements[i][0][0], elements[i][0][1]],
-                           [indicesElementos[i][1], elements[i][1][0], elements[i][1][1]]])
+    elementsComNos.append([[indicesElementos[i][0], elements[i][0][0], elements[i][0][1], elements[i][0][2]],
+                           [indicesElementos[i][1], elements[i][1][0], elements[i][1][1], elements[i][1][2]]])
 
 lista = []
 
@@ -285,6 +334,7 @@ a = np.delete(a, ccs, axis=0)
 
 st.write("a", a)
 st.write("forcas", forcas)
+
 numpyListInverse = np.linalg.inv(a)
 
 deslocamentosNumpy = np.matmul(numpyListInverse, forcasFiltrado)
@@ -333,15 +383,12 @@ for i in range(len(newElements)):
                 newElements[i][k][1] += deslocamentosAgrupados[j][1]
                 newElements[i][k][2] += deslocamentosAgrupados[j][2]
 
+st.write("newElements", newElements)
+
 # Deleta os índices da primeira posição usados como referência
 for i in range(len(newElements)):
     for j in range(2):
         del newElements[i][j][0]
-
-# Acrescenta o 0 da terceira coordenada para a plotagem em 3D
-for i in range(len(newElements)):
-    for j in range(2):
-        newElements[i][j].append(0)
 
 novoComprimento = []
 for i in range(len(newElements)):
@@ -355,22 +402,17 @@ deformacoes = []
 
 for i in range(len(novoComprimento)):
     epsilon = (novoComprimento[i] - Ls[i]) / Ls[i]
-
     deformacoes.append(epsilon)
 
 tensoes = []
 
 for i in range(len(deformacoes)):
     sigma = Es[i] * deformacoes[i]
-
     tensoes.append(sigma)
 
 newPointsWithRep = copy.deepcopy(newElements)
-for i in range(len(newElements)):
-    for j in range(2):
-        del newPointsWithRep[i][j][2]
-        newPointsWithRep[i][j].append(0)
 
+st.write("newPointsWithRep", newPointsWithRep)
 newPoints = []
 
 for i in range(len(newPointsWithRep)):
@@ -378,38 +420,54 @@ for i in range(len(newPointsWithRep)):
         if newPointsWithRep[i][j] not in newPoints:
             newPoints.append(newPointsWithRep[i][j])
 
+st.write("elements", elements)
+st.write("points", points)
 # Tensão nos elementos
 
 # ----------------------------------------------------------------------------------------------------
 
+st.write("newPoints", newPoints)
 with st.expander("Gráfico"):
     fig = plt.figure(facecolor='white')
     ax = fig.add_subplot(111, projection="3d")
+    col1, col2, col3, col4, col5 = st.columns(5)
 
     with st.sidebar.expander("Visualização"):
-        col1, col2 = st.columns(2)
-
         with col1:
-            colorEstrutura = st.color_picker('Cor da estrutura', '#7159c1')
+            color_estrutura = st.color_picker('Estrutura', '#EC2997')
         with col2:
-            colorDeformacao = st.color_picker('Cor da deformação', '#00f900')
+            color_deformacao = st.color_picker('Deformação', '#A600F9')
+        with col3:
+            background_color = st.color_picker("Background", '#D6BEA9')
+        with col4:
+            edge_color = st.color_picker("Cantos", '#FF5B00')
+        with col5:
+            axes_color = st.color_picker("Eixos", '#830D0D')
 
         resposta = st.radio(
             "Gráficos",
             ('Estrutura', 'Estrutura + Deslocamentos', 'Estrutura + Deslocamentos + Tensões'))
         numerar = st.checkbox("Numerar nós")
-        numerarPosDeformacao = st.checkbox("Numerar nós deslocados")
-        numerarElems = st.checkbox("Numerar elementos")
+        numerar_pos_deformacao = st.checkbox("Numerar nós deslocados")
+        numerar_elems = st.checkbox("Numerar elementos")
         cotas = st.checkbox("Cotas e Grid")
 
+        xs_min_max, ys_min_max, zs_min_max = [], [], []
+
+        for i in range(len(newElements)):
+            for j in range(2):
+                xs_min_max.append(newElements[i][j][0])
+                ys_min_max.append(newElements[i][j][1])
+                zs_min_max.append(newElements[i][j][2])
+
         st.write("Rotação")
-        elevation = st.slider('Elevação', 0, 90, 90)
-        azimuth = st.slider('Azimute', 0, 360, 270)
+        elevation = st.slider('Elevação', 0, 180, 40, key=123321)
+        azimuth = st.slider('Azimute', 0, 360, 225, key='12_azi')
 
     if resposta == 'Estrutura':
         for i in range(len(elements)):
             xs, ys, zs = zip(elements[i][0], elements[i][1])
-            ax.plot(xs, ys, zs, color=colorEstrutura, linewidth=Ds[i] * 5)
+            ax.plot(xs, ys, zs, color=color_estrutura, linewidth=Ds[i] * 5)
 
         for i in range(len(points)):
             ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=10)
@@ -417,14 +475,14 @@ with st.expander("Gráfico"):
     elif resposta == 'Estrutura + Deslocamentos':
         for i in range(len(elements)):
             xs, ys, zs = zip(elements[i][0], elements[i][1])
-            ax.plot(xs, ys, zs, color=(0, 0, 1, .1), linewidth=Ds[i] * 5)
+            ax.plot(xs, ys, zs, color=(0, 0, 1, .3), linewidth=Ds[i] * 5)
 
         for i in range(len(points)):
             ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=5)
 
         for i in range(len(newElements)):
             xs, ys, zs = zip(newElements[i][0], newElements[i][1])
-            ax.plot(xs, ys, zs, color=colorDeformacao, linewidth=Ds[i] * 5)
+            ax.plot(xs, ys, zs, color=color_deformacao, linewidth=Ds[i] * 5)
     else:
         for k in range(len(elements)):
             xs, ys, zs = zip(elements[k][0], elements[k][1])
@@ -449,43 +507,36 @@ with st.expander("Gráfico"):
             elif .1 * max(tensoes) > tensoes[i] >= .1 * min(tensoes):
                 ax.plot(xs, ys, zs, color=(0, 1, 0), linewidth=Ds[i] * 5)
 
-    xsMinMax, ysMinMax, zsMinMax = [], [], []
-
-    for i in range(len(newElements)):
-        for j in range(2):
-            xsMinMax.append(newElements[i][j][0])
-            ysMinMax.append(newElements[i][j][1])
-            zsMinMax.append(newElements[i][j][2])
-
     if numerar:
         for i in range(len(pontoNo)):
             ax.text(pontoNo[i][0] + .2, pontoNo[i][1] + .2, pontoNo[i][2] + .2,
-                    "{}".format(i + 1), color='black', ha='left', va='bottom', size=5)
+                    "{}".format(i + 1), color='black', ha='left', va='top', size=6)
 
     # Numerando os elementos
-    midPointNewElements = []
+    mid_point_new_elements = []
 
     for i in range(len(newElements)):
-        midPointNewElements.append([])
+        mid_point_new_elements.append([])
 
     for j in range(3):
         for i in range(len(newElements)):
-            midPoint = (newElements[i][0][j] + newElements[i][1][j]) * .5
-            midPointNewElements[i].append(midPoint)
+            mid_point = (newElements[i][0][j] + newElements[i][1][j]) * .5
+            mid_point_new_elements[i].append(mid_point)
 
-    if numerarElems:
-        for i in range(len(midPointNewElements)):
-            ax.text(midPointNewElements[i][0] + .2, midPointNewElements[i][1] + .2, midPointNewElements[i][2] + .2,
+    if numerar_elems:
+        for i in range(len(mid_point_new_elements)):
+            ax.text(mid_point_new_elements[i][0] + .2, mid_point_new_elements[i][1] + .2,
+                    mid_point_new_elements[i][2] + .2,
                     "{}".format(i + 1), color='black', ha='left', va='bottom', size=4)
 
-    if numerarPosDeformacao:
+    if numerar_pos_deformacao:
         for m in range(len(newPoints)):
             ax.text(newPoints[m][0] + .2, newPoints[m][1] + .2, newPoints[m][2] + .2,
                     "{}'".format(m + 1), color='black', ha='left', va='bottom', size=5)
 
-    ax.set_xlim(min(xsMinMax) - 2, max(xsMinMax) + 2)
-    ax.set_ylim(min(ysMinMax) - 2, max(ysMinMax) + 2)
-    ax.set_zlim(min(zsMinMax) - 2, max(zsMinMax) + 2)
+    ax.set_xlim(min(xs_min_max) - 1, max(xs_min_max) + 1)
+    ax.set_ylim(min(ys_min_max) - 1, max(ys_min_max) + 1)
+    ax.set_zlim(min(zs_min_max) - 1, max(zs_min_max) + 1)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("z")
@@ -495,12 +546,20 @@ with st.expander("Gráfico"):
         ax.set_xticks([])
         ax.set_zticks([])
 
+    ax.xaxis.pane.set_edgecolor(edge_color)
+    ax.yaxis.pane.set_edgecolor(edge_color)
+    ax.zaxis.pane.set_edgecolor(edge_color)
+    ax.set_facecolor(background_color)
+
+    ax.xaxis.label.set_color(axes_color)  # setting up X-axis label color to yellow
+    ax.yaxis.label.set_color(axes_color)
+    ax.zaxis.label.set_color(axes_color)
+
+    ax.tick_params(axis='x', colors=axes_color)  # setting up X-axis tick color to red
+    ax.tick_params(axis='y', colors=axes_color)
+    ax.tick_params(axis='z', colors=axes_color)
+
     ax.view_init(elevation, azimuth)
 
     st.pyplot(fig)
-
-with st.sidebar.expander("Ajuda"):
-    with open('./instructions/instructions.pdf', 'rb') as f:
-        st.download_button('Documentação', f, file_name='instructions.pdf')
-
 # -----------------------------------------------------------------------------------------------------------
