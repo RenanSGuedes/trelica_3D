@@ -450,6 +450,7 @@ if resposta == 'Arquivo .csv':
 
     deformacoes = []
 
+    st.write("Ls", Ls)
     for i in range(len(novoComprimento)):
         epsilon = (novoComprimento[i] - Ls[i]) / Ls[i]
         deformacoes.append(epsilon)
@@ -688,9 +689,9 @@ else:
         if [xp2s[i], yp2s[i], zp2s[i]] not in points:
             points.append([xp2s[i], yp2s[i], zp2s[i]])
 
-        comprimento = ((float(xp2) - float(xp1)) ** 2 +
-                       (float(yp2) - float(yp1)) ** 2 +
-                       (float(zp2) - float(zp1)) ** 2) ** .5
+        comprimento = ((float(xp2s[i]) - float(xp1s[i])) ** 2 +
+                       (float(yp2s[i]) - float(yp1s[i])) ** 2 +
+                       (float(zp2s[i]) - float(zp1s[i])) ** 2) ** .5
 
         cteL = (xp2s[i] - xp1s[i]) / comprimento
         cteM = (yp2s[i] - yp1s[i]) / comprimento
@@ -1051,6 +1052,8 @@ else:
             novoComprimento.append(comprimento)
 
     deformacoes = []
+
+    st.write("Ls", Ls)
 
     for i in range(len(novoComprimento)):
         epsilon = (novoComprimento[i] - Ls[i]) / Ls[i]
