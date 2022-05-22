@@ -1,46 +1,36 @@
-import copy
+# importing pandas as pd
+import pandas as pd
+  
+# creating the dataframe
+df = pd.DataFrame({"Name": ['Anurag', 'Manjeet', 'Shubham', 
+                            'Saurabh', 'Ujjawal'],
+                     
+                   "Address": ['Patna', 'Delhi', 'Coimbatore',
+                               'Greater noida', 'Patna'],
+                     
+                   "ID": [20123, 20124, 20145, 20146, 20147],
+                     
+                   "Sell": [140000, 300000, 600000, 200000, 600000]})
+  
+print("Original DataFrame :")
+html = df.to_html()
 
-pontoNo, elementsComNos = [], []
+text_file = open("index.html", "w")
+text_file.write(f'''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
 
-elements = [
-    [[0, 0, 0], [12, 8, 0]],
-    [[12, 8, 0], [12, 0, 0]],
-]
-listaP = []
+<body>
+    <h1>Hello, world! :smile:</h1>
+    {html}
+</body>
+</html>
+''')
 
-for item in elements:
-    for j in range(2):
-        listaP.append(item[j])
-
-for i in range(len(listaP)):
-    if listaP[i] not in pontoNo:
-        pontoNo.append(listaP[i])
-
-print("pontoNo", pontoNo)
-
-pontoNoAgrupado = []
-
-for i in range(len(pontoNo)):
-    pontoNoAgrupado.append([pontoNo[i], i + 1])
-
-print("pontoNoAgrupado", pontoNoAgrupado)
-
-indicesElementos = copy.deepcopy(elements)
-
-for i in range(len(elements)):
-    for j in range(2):
-        for k in range(len(pontoNoAgrupado)):
-            if elements[i][j] == pontoNoAgrupado[k][0]:
-                indicesElementos[i][j] = pontoNoAgrupado[k][1]
-
-print("elements", elements)
-print("indicesElementos", indicesElementos)
-print("listaP", listaP)
-
-print("elementsComNos", elementsComNos)
-
-for i in range(len(indicesElementos)):
-    elementsComNos.append([[indicesElementos[i][0], elements[i][0][0], elements[i][0][1]],
-                           [indicesElementos[i][1], elements[i][1][0], elements[i][1][1]]])
-
-print("elementsComNos", elementsComNos)
+text_file.close()

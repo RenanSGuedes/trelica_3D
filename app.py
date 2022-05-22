@@ -14,135 +14,137 @@ fis, Ls, Es, As, points, elements, elementsComNos, indicesElementos, Ds, desloca
 rows = []
 vvs = []
 
+dados_gerais = []
+
 xp1s, yp1s, zp1s, xp2s, yp2s, zp2s = [], [], [], [], [], []
 
 cteLs, cteMs, cteNs = [], [], []
 
 def lerArquivo():
-	uploaded_file = st.file_uploader("Escolha um arquivo")
+    uploaded_file = st.file_uploader("Escolha um arquivo")
 
-	@st.cache(suppress_st_warning=True)
-	def readCSVFile(file):
-		if file is not None:
-			return pd.read_csv(file)
-		else:
-			return st.write('Hello')
+    @st.cache(suppress_st_warning=True)
+    def readCSVFile(file):
+        if file is not None:
+            return pd.read_csv(file)
+        else:
+            return st.write('Hello')
 
-	pandasToPythonList = readCSVFile(uploaded_file).values.tolist()
+    pandasToPythonList = readCSVFile(uploaded_file).values.tolist()
 
-	for row in pandasToPythonList:
-		rows.append(row)
+    for row in pandasToPythonList:
+        rows.append(row)
 
-	for i in range(int(len(rows))):
-		xp1, yp1, zp1, xp2, yp2, zp2, Ei, D = [
-			rows[i][0],
-			rows[i][1],
-			rows[i][2],
-			rows[i][3],
-			rows[i][4],
-			rows[i][5],
-			rows[i][6],
-			rows[i][7]
-		]
+    for i in range(len(rows)):
+        xp1, yp1, zp1, xp2, yp2, zp2, Ei, D = [
+            rows[i][0],
+            rows[i][1],
+            rows[i][2],
+            rows[i][3],
+            rows[i][4],
+            rows[i][5],
+            rows[i][6],
+            rows[i][7]
+        ]
 
-		xp1s.append(float(xp1))
-		yp1s.append(float(yp1))
-		zp1s.append(float(zp1))
-		xp2s.append(float(xp2))
-		yp2s.append(float(yp2))
-		zp2s.append(float(zp2))
-		Es.append(Ei)
-		Ds.append(D)
+        dados_gerais.append([i + 1, xp1, xp2, zp1, xp2, yp2, zp2, Ei, D])
+        xp1s.append(float(xp1))
+        yp1s.append(float(yp1))
+        zp1s.append(float(zp1))
+        xp2s.append(float(xp2))
+        yp2s.append(float(yp2))
+        zp2s.append(float(zp2))
+        Es.append(Ei)
+        Ds.append(D)
 
-		if [xp1, yp1, zp1] not in points:
-			points.append([xp1, yp1, zp1])
-		if [xp2, yp2, zp2] not in points:
-			points.append([xp2, yp2, zp2])
+        if [xp1, yp1, zp1] not in points:
+            points.append([xp1, yp1, zp1])
+        if [xp2, yp2, zp2] not in points:
+            points.append([xp2, yp2, zp2])
 
-		elements.append([[float(xp1), float(yp1), float(zp1)], [float(xp2), float(yp2), float(zp2)]])
-		comprimento = ((float(xp2) - float(xp1)) ** 2 +
-							(float(yp2) - float(yp1)) ** 2 +
-							(float(zp2) - float(zp1)) ** 2) ** .5
+        elements.append([[float(xp1), float(yp1), float(zp1)], [float(xp2), float(yp2), float(zp2)]])
+        comprimento = ((float(xp2) - float(xp1)) ** 2 +
+                            (float(yp2) - float(yp1)) ** 2 +
+                            (float(zp2) - float(zp1)) ** 2) ** .5
 
-		cteL = (xp2s[i] - xp1s[i]) / comprimento
-		cteM = (yp2s[i] - yp1s[i]) / comprimento
-		cteN = (zp2s[i] - zp1s[i]) / comprimento
+        cteL = (xp2s[i] - xp1s[i]) / comprimento
+        cteM = (yp2s[i] - yp1s[i]) / comprimento
+        cteN = (zp2s[i] - zp1s[i]) / comprimento
 
-		Ls.append(comprimento)
-		As.append(D ** 2)
-		cteLs.append(cteL)
-		cteMs.append(cteM)
-		cteNs.append(cteN)
+        Ls.append(comprimento)
+        As.append(D ** 2)
+        cteLs.append(cteL)
+        cteMs.append(cteM)
+        cteNs.append(cteN)
 
 def lerInputsManuais():
-  n_elementos = st.number_input("Número de elementos", step=1, key="elements_number")
+    n_elementos = st.number_input("Número de elementos", step=1, key="elements_number")
 
-  for i in range(n_elementos):
-    with st.sidebar.expander("Elemento {}".format(i + 1)):
-      xp1 = st.number_input(
-          'xp1',
-          key='xp1_{}'.format(i)
-      )
-      yp1 = st.number_input(
-          "yp1",
-          key='yp1_{}'.format(i)
-      )
-      zp1 = st.number_input(
-          "zp1",
-          key='zp1_{}'.format(i)
-      )
-      xp2 = st.number_input(
-          "xp2",
-          key='xp2_{}'.format(i)
-      )
-      yp2 = st.number_input(
-          "yp2",
-          key='yp2_{}'.format(i)
-      )
-      zp2 = st.number_input(
-          "zp2",
-          key='zp2_{}'.format(i)
-      )
-      Ei = st.number_input(
-          "E (MPa)",
-          key='moduloE_{}'.format(i)
-      )
-      D = st.number_input(
-          "D (m)",
-          key='diametro_{}'.format(i)
-      )
-      xp1s.append(xp1)
-      yp1s.append(yp1)
-      zp1s.append(zp1)
-      xp2s.append(xp2)
-      yp2s.append(yp2)
-      zp2s.append(zp2)
-      Es.append(Ei)
-      Ds.append(D)
+    for i in range(n_elementos):
+        with st.sidebar.expander("Elemento {}".format(i + 1)):
+            xp1 = st.number_input(
+                'xp1',
+                key='xp1_{}'.format(i)
+            )
+            yp1 = st.number_input(
+              "yp1",
+              key='yp1_{}'.format(i)
+            )
+            zp1 = st.number_input(
+              "zp1",
+              key='zp1_{}'.format(i)
+            )
+            xp2 = st.number_input(
+              "xp2",
+              key='xp2_{}'.format(i)
+            )
+            yp2 = st.number_input(
+              "yp2",
+              key='yp2_{}'.format(i)
+            )
+            zp2 = st.number_input(
+              "zp2",
+              key='zp2_{}'.format(i)
+            )
+            Ei = st.number_input(
+              "E (MPa)",
+              key='moduloE_{}'.format(i)
+            )
+            D = st.number_input(
+              "D (m)",
+              key='diametro_{}'.format(i)
+            )
+        xp1s.append(xp1)
+        yp1s.append(yp1)
+        zp1s.append(zp1)
+        xp2s.append(xp2)
+        yp2s.append(yp2)
+        zp2s.append(zp2)
+        Es.append(Ei)
+        Ds.append(D)
 
-  for i in range(n_elementos):
-    rows.append([xp1s[i], yp1s[i], zp1s[i], xp2s[i], yp2s[i], zp2s[i], Es[i], Ds[i]])
+    for i in range(n_elementos):
+        rows.append([xp1s[i], yp1s[i], zp1s[i], xp2s[i], yp2s[i], zp2s[i], Es[i], Ds[i]])
 
-    if [xp1s[i], yp1s[i], zp1s[i]] not in points:
-      points.append([xp1s[i], yp1s[i], zp1s[i]])
-    if [xp2s[i], yp2s[i], zp2s[i]] not in points:
-      points.append([xp2s[i], yp2s[i], zp2s[i]])
+        if [xp1s[i], yp1s[i], zp1s[i]] not in points:
+            points.append([xp1s[i], yp1s[i], zp1s[i]])
+        if [xp2s[i], yp2s[i], zp2s[i]] not in points:
+            points.append([xp2s[i], yp2s[i], zp2s[i]])
 
-    comprimento = ((float(xp2s[i]) - float(xp1s[i])) ** 2 +
-              (float(yp2s[i]) - float(yp1s[i])) ** 2 +
-              (float(zp2s[i]) - float(zp1s[i])) ** 2) ** .5
+        comprimento = ((float(xp2s[i]) - float(xp1s[i])) ** 2 +
+                  (float(yp2s[i]) - float(yp1s[i])) ** 2 +
+                  (float(zp2s[i]) - float(zp1s[i])) ** 2) ** .5
 
-    cteL = (xp2s[i] - xp1s[i]) / comprimento
-    cteM = (yp2s[i] - yp1s[i]) / comprimento
-    cteN = (zp2s[i] - zp1s[i]) / comprimento
+        cteL = (xp2s[i] - xp1s[i]) / comprimento
+        cteM = (yp2s[i] - yp1s[i]) / comprimento
+        cteN = (zp2s[i] - zp1s[i]) / comprimento
 
-    elements.append([[xp1s[i], yp1s[i], zp1s[i]], [xp2s[i], yp2s[i], zp2s[i]]])
-    Ls.append(comprimento)
-    As.append(pi / 4 * Ds[i] ** 2)
-    cteLs.append(cteL)
-    cteMs.append(cteM)
-    cteNs.append(cteN)
-
+        elements.append([[xp1s[i], yp1s[i], zp1s[i]], [xp2s[i], yp2s[i], zp2s[i]]])
+        Ls.append(comprimento)
+        As.append(pi / 4 * Ds[i] ** 2)
+        cteLs.append(cteL)
+        cteMs.append(cteM)
+        cteNs.append(cteN)
 
 with st.sidebar.expander("Exemplos"):
     st.text('Básico')
@@ -165,21 +167,17 @@ resposta = st.radio(
     key="radio_input",
     index=0
 )
-    
+
 if resposta == 'Arquivo .csv':
    lerArquivo()
 else:
    lerInputsManuais()
-    
+
 
 col1, col2 = st.columns(2)
 
 fig = plt.figure(facecolor='white')
 ax = fig.add_subplot(111, projection="3d")
-
-ax.set_xlabel("x")
-ax.set_ylabel("y")
-ax.set_zlabel("z")
 
 colA, colB, colC, colD, colE = st.columns(5)
 
@@ -193,6 +191,23 @@ with colD:
     axes_color = st.color_picker("Eixos", '#ff5f5f', key=66)
 with colE:
     points_color = st.color_picker("Nós", '#ff5f5f', key=77)
+    
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.set_zlabel("z")
+
+ax.xaxis.pane.set_edgecolor(edge_color)
+ax.yaxis.pane.set_edgecolor(edge_color)
+ax.zaxis.pane.set_edgecolor(edge_color)
+ax.set_facecolor(background_color)
+
+ax.xaxis.label.set_color(axes_color)  # setting up X-axis label color to yellow
+ax.yaxis.label.set_color(axes_color)
+ax.zaxis.label.set_color(axes_color)
+
+ax.tick_params(axis='x', colors=axes_color)  # setting up X-axis tick color to red
+ax.tick_params(axis='y', colors=axes_color)
+ax.tick_params(axis='z', colors=axes_color)
 
 with col1:
     st.header("Vista geral")
@@ -200,6 +215,8 @@ with col1:
 
     elevation = st.slider('Elevação', 0, 180, 40)
     azimuth = st.slider('Azimute', 0, 360, 225)
+    
+    ax.view_init(elevation, azimuth)
 with col2:
     for i in range(len(elements)):
         xs, ys, zs = zip(elements[i][0], elements[i][1])
@@ -208,20 +225,6 @@ with col2:
     for i in range(len(points)):
         ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], color=points_color, s=12)
 
-        ax.xaxis.pane.set_edgecolor(edge_color)
-        ax.yaxis.pane.set_edgecolor(edge_color)
-        ax.zaxis.pane.set_edgecolor(edge_color)
-        ax.set_facecolor(background_color)
-
-        ax.xaxis.label.set_color(axes_color)  # setting up X-axis label color to yellow
-        ax.yaxis.label.set_color(axes_color)
-        ax.zaxis.label.set_color(axes_color)
-
-        ax.tick_params(axis='x', colors=axes_color)  # setting up X-axis tick color to red
-        ax.tick_params(axis='y', colors=axes_color)
-        ax.tick_params(axis='z', colors=axes_color)
-
-        ax.view_init(elevation, azimuth)
     st.pyplot(fig)
 # -------------------------------------------------------------------------------------------
 with st.sidebar.expander("Propriedades dos elementos"):
@@ -494,6 +497,7 @@ with containerDeslocamentos.expander("Deslocamentos"):
         )
     st.write(np.array(deslocamentosAgrupadosTabela))
 
+    st.write(deslocamentosAgrupados)
 newElements = copy.deepcopy(elementsComNos)
 
 for i in range(len(newElements)):
@@ -706,3 +710,47 @@ with st.expander("Gráfico"):
     ax.view_init(elevation, azimuth)
 
     st.pyplot(fig)
+    
+if st.button('Gerar dados'):
+    df_gerais = pd.DataFrame(np.array(dados_gerais), columns=['Elemento', 'x(p1)', 'y(p1)', 'z(p1)', 'x(p2)', 'y(p2)', 'z(p2)', 'Ei', 'D'])
+    df_deslocamentos = pd.DataFrame(np.array(deslocamentosAgrupados), columns = ['Elemento', 'u (m)', 'v (m)', 'w (m)'])
+    df_tensoes = pd.DataFrame(np.array(tensoesTabela), columns = ['Elemento', 'Tensão (MPa)'])
+    df_deformacoes = pd.DataFrame(np.array(deformacoesTabela), columns = ['Elemento', 'Deformação (%)'])
+    
+    gerais_html = df_gerais.to_html()
+    deslocamentos_html = df_deslocamentos.to_html()
+    tensoes_html = df_tensoes.to_html()
+    deformacoes_html = df_deformacoes.to_html()
+
+    text_file = open("index.html", "w")
+    text_file.write(f'''
+    <!DOCTYPE html>
+    <html lang="pt">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="styles.css">
+        <title>Dados da estrutura</title>
+    </head>
+
+    <body>
+        <h1>Informações dos elementos</h1>
+        {gerais_html}
+        <h1>Deslocamentos nodais</h1>
+        {deslocamentos_html}
+        <h1>Tensões por elemento</h1>
+        {tensoes_html}
+        <h1>Deformações</h1>
+        {deformacoes_html}
+    </body>
+    </html>
+    ''')
+
+    text_file.close()
+    
+    try:    
+        with open('./index.html', 'rb') as f:
+            st.download_button('Documentação', f, file_name='instructions.html')
+    except ValueError:
+        st.write("Erro") 
