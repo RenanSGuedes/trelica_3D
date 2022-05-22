@@ -1,29 +1,34 @@
 
     <!DOCTYPE html>
-    <html lang="pt">
+    <html lang="pt">   
     <head>
         <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="styles.css">
+        <style>
+            body {
+                background-color: aqua;
+            }
+        </style>
         <title>Dados da estrutura</title>
     </head>
 
     <body>
-        <h1>Informaï¿½ï¿½es dos elementos</h1>
+        <h1>Informações dos elementos</h1>
         <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
       <th>Elemento</th>
-      <th>x(p1)</th>
-      <th>y(p1)</th>
-      <th>z(p1)</th>
-      <th>x(p2)</th>
-      <th>y(p2)</th>
-      <th>z(p2)</th>
-      <th>Ei</th>
-      <th>D</th>
+      <th>x(p1) (m)</th>
+      <th>y(p1) (m)</th>
+      <th>z(p1) (m)</th>
+      <th>x(p2) (m)</th>
+      <th>y(p2) (m)</th>
+      <th>z(p2) (m)</th>
+      <th>L (m)</th>
+      <th>Ei (MPa)</th>
+      <th>D (m)</th>
     </tr>
   </thead>
   <tbody>
@@ -36,6 +41,7 @@
       <td>0.0</td>
       <td>1.0</td>
       <td>2.0</td>
+      <td>2.449490</td>
       <td>21000000.0</td>
       <td>0.25</td>
     </tr>
@@ -48,6 +54,7 @@
       <td>0.0</td>
       <td>0.0</td>
       <td>2.0</td>
+      <td>2.236068</td>
       <td>21000000.0</td>
       <td>0.25</td>
     </tr>
@@ -60,6 +67,7 @@
       <td>1.0</td>
       <td>0.0</td>
       <td>2.0</td>
+      <td>2.000000</td>
       <td>21000000.0</td>
       <td>0.25</td>
     </tr>
@@ -72,6 +80,7 @@
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
+      <td>1.000000</td>
       <td>21000000.0</td>
       <td>0.25</td>
     </tr>
@@ -92,9 +101,9 @@
     <tr>
       <th>0</th>
       <td>1.0</td>
-      <td>0.005731</td>
-      <td>0.133082</td>
-      <td>-0.007687</td>
+      <td>0.012973</td>
+      <td>0.137303</td>
+      <td>-0.006177</td>
     </tr>
     <tr>
       <th>1</th>
@@ -126,13 +135,13 @@
     </tr>
   </tbody>
 </table>
-        <h1>Tensï¿½es por elemento</h1>
+        <h1>Tensões por elemento</h1>
         <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
       <th>Elemento</th>
-      <th>Tensï¿½o (MPa)</th>
+      <th>Tensão (MPa)</th>
     </tr>
   </thead>
   <tbody>
@@ -144,32 +153,32 @@
     <tr>
       <th>1</th>
       <td>Elemento 1</td>
-      <td>-0.4189</td>
+      <td>-0.4058</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Elemento 2</td>
-      <td>0.0612</td>
+      <td>0.0942</td>
     </tr>
     <tr>
       <th>3</th>
       <td>Elemento 3</td>
-      <td>0.0465</td>
+      <td>0.0499</td>
     </tr>
     <tr>
       <th>4</th>
       <td>Elemento 4</td>
-      <td>0.3045</td>
+      <td>0.4670</td>
     </tr>
   </tbody>
 </table>
-        <h1>Deformaï¿½ï¿½es</h1>
+        <h1>Deformações</h1>
         <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
       <th>Elemento</th>
-      <th>Deformaï¿½ï¿½o (%)</th>
+      <th>Deformação (%)</th>
     </tr>
   </thead>
   <tbody>
@@ -181,22 +190,22 @@
     <tr>
       <th>1</th>
       <td>Elemento 1</td>
-      <td>-1.9945</td>
+      <td>-1.9323</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Elemento 2</td>
-      <td>0.2916</td>
+      <td>0.4487</td>
     </tr>
     <tr>
       <th>3</th>
       <td>Elemento 3</td>
-      <td>0.2216</td>
+      <td>0.2375</td>
     </tr>
     <tr>
       <th>4</th>
       <td>Elemento 4</td>
-      <td>1.4498</td>
+      <td>2.2236</td>
     </tr>
   </tbody>
 </table>

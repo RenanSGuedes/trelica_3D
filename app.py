@@ -47,7 +47,6 @@ def lerArquivo():
             rows[i][7]
         ]
 
-        dados_gerais.append([i + 1, xp1, xp2, zp1, xp2, yp2, zp2, Ei, D])
         xp1s.append(float(xp1))
         yp1s.append(float(yp1))
         zp1s.append(float(zp1))
@@ -711,8 +710,13 @@ with st.expander("Gráfico"):
 
     st.pyplot(fig)
     
+# Insere os dados de cada elemento
+
+for i in range(len(elements)):
+    dados_gerais.append([i + 1, xp1s[i], xp2s[i], zp1s[i], xp2s[i], yp2s[i], zp2s[i], Ls[i], Es[i], Ds[i]])
+
 if st.button('Gerar dados'):
-    df_gerais = pd.DataFrame(np.array(dados_gerais), columns=['Elemento', 'x(p1)', 'y(p1)', 'z(p1)', 'x(p2)', 'y(p2)', 'z(p2)', 'Ei', 'D'])
+    df_gerais = pd.DataFrame(np.array(dados_gerais), columns=['Elemento', 'x(p1) (m)', 'y(p1) (m)', 'z(p1) (m)', 'x(p2) (m)', 'y(p2) (m)', 'z(p2) (m)', 'L (m)', 'Ei (MPa)', 'D (m)'])
     df_deslocamentos = pd.DataFrame(np.array(deslocamentosAgrupados), columns = ['Elemento', 'u (m)', 'v (m)', 'w (m)'])
     df_tensoes = pd.DataFrame(np.array(tensoesTabela), columns = ['Elemento', 'Tensão (MPa)'])
     df_deformacoes = pd.DataFrame(np.array(deformacoesTabela), columns = ['Elemento', 'Deformação (%)'])
@@ -725,12 +729,16 @@ if st.button('Gerar dados'):
     text_file = open("index.html", "w")
     text_file.write(f'''
     <!DOCTYPE html>
-    <html lang="pt">
+    <html lang="pt">   
     <head>
         <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="styles.css">
+        <style>
+            body {'{'}
+                background-color: aqua;
+            {'}'}
+        </style>
         <title>Dados da estrutura</title>
     </head>
 
