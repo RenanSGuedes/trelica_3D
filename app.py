@@ -159,6 +159,12 @@ with st.sidebar.expander("Exemplos"):
     st.image(image, use_column_width=True)
     with open('./csv_files/estrutura_3D_4.csv', 'rb') as f:
         st.download_button('Baixar', f, file_name='estrutura_3D_4.csv')
+        
+    st.text('Estrutura complexa')
+    image = Image.open('./images/estrutura_70.png')
+    st.image(image, use_column_width=True)
+    with open('./csv_files/estrutura_3D_70.csv', 'rb') as f:
+        st.download_button('Baixar', f, file_name='estrutura_3D_70.csv')
 
 st.title("Método dos Elementos Finitos")
 
@@ -373,7 +379,7 @@ for i in range(len(pontoNo)):
             "Quais as restrições?",
             ('X', 'Y', 'Z', 'XY', 'XZ', 'YZ', 'XYZ', 'L'),
             key="radio_{}".format(i),
-            index=6
+            index=7
         )
 
         if resposta == 'X':
