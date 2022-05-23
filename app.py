@@ -202,6 +202,7 @@ with colE:
 ax.set_xlabel("x")
 ax.set_ylabel("y")
 ax.set_zlabel("z")
+fig.patch.set_facecolor(background_color)
 
 ax.xaxis.pane.set_edgecolor(edge_color)
 ax.yaxis.pane.set_edgecolor(edge_color)
@@ -618,6 +619,10 @@ with st.expander("Gráfico"):
         st.write("Rotação")
         elevation = st.slider('Elevação', 0, 180, 40, key=123321)
         azimuth = st.slider('Azimute', 0, 360, 225, key='12_azi')
+        st.write('Escala dos eixos')
+        scale_x = st.slider('Escala em x', 0, 10, 1, key='sc_x')        
+        scale_y = st.slider('Escala em y', 0, 10, 1, key='sc_y')
+        scale_z = st.slider('Escala em z', 0, 10, 1, key='sc_z')
 
     if resposta == 'Estrutura':
         for i in range(len(elements)):
@@ -692,6 +697,7 @@ with st.expander("Gráfico"):
     ax.set_xlim(min(xs_min_max) - 1, max(xs_min_max) + 1)
     ax.set_ylim(min(ys_min_max) - 1, max(ys_min_max) + 1)
     ax.set_zlim(min(zs_min_max) - 1, max(zs_min_max) + 1)
+    ax.set_box_aspect((scale_x, scale_y, scale_z))
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("z")
@@ -705,6 +711,7 @@ with st.expander("Gráfico"):
     ax.yaxis.pane.set_edgecolor(edge_color)
     ax.zaxis.pane.set_edgecolor(edge_color)
     ax.set_facecolor(background_color)
+    fig.patch.set_facecolor(background_color)
 
     ax.xaxis.label.set_color(axes_color)  # setting up X-axis label color to yellow
     ax.yaxis.label.set_color(axes_color)
@@ -830,3 +837,20 @@ if st.button('Gerar dados'):
             st.download_button('Baixar', f, file_name='data.html')
     except ValueError:
         st.write("Erro") 
+        
+plt.savefig('3D_graphic.pdf')
+plt.savefig('3D_graphic.svg')
+
+with st.sidebar.expander("Download do gráfico"):
+    resposta = st.radio(
+    "SVG ou PDF",
+    ('SVG', 'PDF'),
+    key="radio_input",
+    index=0
+)  
+    if resposta == 'SVG':
+        with open('./3D_graphic.svg', 'rb') as f:
+            st.download_button('Baixar', f, file_name='3D_graphic.svg')
+    else:
+        with open('./3D_graphic.pdf', 'rb') as f:
+            st.download_button('Baixar', f, file_name='3D_graphic.pdf')
