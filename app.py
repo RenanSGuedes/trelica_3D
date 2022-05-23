@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import pandas as pd
 import streamlit as st
 import numpy as np
@@ -472,7 +474,7 @@ col1, col2 = st.columns(2)
 
 containerDeslocamentos = st.container()
 
-st.write("deslocamentosAgrupados", deslocamentosAgrupados)
+# st.write("deslocamentosAgrupados", deslocamentosAgrupados)
 
 deslocamentosConfiguradosParaATabela = copy.deepcopy(deslocamentosAgrupados)  # Qdo é "R"
 
@@ -481,7 +483,7 @@ for i in range(len(deslocamentosAgrupados)):
         if deslocamentosConfiguradosParaATabela[i][j] == "R":
             deslocamentosConfiguradosParaATabela[i][j] = 0
 
-st.write(deslocamentosConfiguradosParaATabela)
+# st.write(deslocamentosConfiguradosParaATabela)
 
 deslocamentosAgrupadosTabela = []
 with containerDeslocamentos.expander("Deslocamentos"):
@@ -496,7 +498,7 @@ with containerDeslocamentos.expander("Deslocamentos"):
         )
     st.write(np.array(deslocamentosAgrupadosTabela))
 
-    st.write(deslocamentosAgrupados)
+    # (deslocamentosAgrupados)
 newElements = copy.deepcopy(elementsComNos)
 
 for i in range(len(newElements)):
@@ -524,7 +526,7 @@ for i in range(len(newElements)):
 
 deformacoes = []
 
-st.write("Ls", Ls)
+# st.write("Ls", Ls)
 for i in range(len(novoComprimento)):
     epsilon = (novoComprimento[i] - Ls[i]) / Ls[i]
     deformacoes.append(epsilon)
@@ -713,13 +715,16 @@ with st.expander("Gráfico"):
 # Insere os dados de cada elemento
 
 for i in range(len(elements)):
-    dados_gerais.append([i + 1, xp1s[i], xp2s[i], zp1s[i], xp2s[i], yp2s[i], zp2s[i], Ls[i], Es[i], Ds[i]])
+    dados_gerais.append(["Elemento {}".format(int(i + 1)), xp1s[i], xp2s[i], zp1s[i], xp2s[i], yp2s[i], zp2s[i], format(Ls[i], '.2f'), Es[i], Ds[i]])
 
 if st.button('Gerar dados'):
+    del tensoesTabela[0]
+    del deformacoesTabela[0]
+    
     df_gerais = pd.DataFrame(np.array(dados_gerais), columns=['Elemento', 'x(p1) (m)', 'y(p1) (m)', 'z(p1) (m)', 'x(p2) (m)', 'y(p2) (m)', 'z(p2) (m)', 'L (m)', 'Ei (MPa)', 'D (m)'])
     df_deslocamentos = pd.DataFrame(np.array(deslocamentosAgrupados), columns = ['Elemento', 'u (m)', 'v (m)', 'w (m)'])
-    df_tensoes = pd.DataFrame(np.array(tensoesTabela), columns = ['Elemento', 'Tensão (MPa)'])
-    df_deformacoes = pd.DataFrame(np.array(deformacoesTabela), columns = ['Elemento', 'Deformação (%)'])
+    df_tensoes = pd.DataFrame(np.array(tensoesTabela), columns = ['Elemento', 'Sigma (MPa)'])
+    df_deformacoes = pd.DataFrame(np.array(deformacoesTabela), columns = ['Elemento', 'Epsilon (%)'])
     
     gerais_html = df_gerais.to_html()
     deslocamentos_html = df_deslocamentos.to_html()
@@ -735,21 +740,78 @@ if st.button('Gerar dados'):
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            body {'{'}
-                background-color: aqua;
+            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
+            
+            @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,600);
+
+            *, *:before, *:after {'{'}
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
             {'}'}
+            body {'{'}
+                font-family: 'Open Sans', sans-serif;
+                width: 100%;
+                height: 100vh;
+                background: linear-gradient(125deg, aqua, #ff5f5f, rgb(208, 239, 225), violet);
+                background-size: 400% 400%;
+                animation: bgColors 15s infinite;
+                padding: 20px;
+            {'}'}
+            @keyframes bgColors {'{'}
+                0% {'{'}
+                    background-position: 0 50%;
+                {'}'}
+                50% {'{'}
+                    background-position: 100% 50%;
+                {'}'}
+                100% {'{'}
+                    background-position: 0 50%;
+                {'}'}
+            {'}'}
+                table {'{'}
+                background: #012B39;
+                border-radius: 0.25em;
+                border-collapse: collapse;
+                margin: 1em;
+            {'}'}
+            th {'{'}
+                border-bottom: 1px solid #364043;
+                color: #E2B842;
+                font-size: 0.85em;
+                font-weight: 600;
+                padding: 0.5em 1em;
+                text-align: left;
+            {'}'}
+            td {'{'}
+                color: #fff;
+                font-weight: 400;
+                padding: 0.65em 1em;
+            {'}'}
+            .disabled td {'{'}
+                color: #4F5F64;
+            {'}'}
+                tbody tr {'{'}
+                transition: background 0.25s ease;
+            {'}'}
+            tbody tr:hover {'{'}
+                background: #014055;
+            {'}'}
+            
         </style>
         <title>Dados da estrutura</title>
     </head>
 
     <body>
-        <h1>Informações dos elementos</h1>
+        <h1>Informa&#231;&#245;es dos elementos</h1>
         {gerais_html}
         <h1>Deslocamentos nodais</h1>
         {deslocamentos_html}
-        <h1>Tensões por elemento</h1>
+        <h1>Tens&#245;es por elemento</h1>
         {tensoes_html}
-        <h1>Deformações</h1>
+        <h2>Tens&#227;o m&#225;xima de tra&#231;&#227;o: {format(max(tensoes)*10**(-6), '.4f')} MPa</h2>
+        <h2>Tens&#227;o m&#225;xima de compress&#227;o: {format(min(tensoes)*10**(-6), '.4f')} MPa</h2>
+        <h1>Deforma&#231;&#245;es</h1>
         {deformacoes_html}
     </body>
     </html>
@@ -759,6 +821,6 @@ if st.button('Gerar dados'):
     
     try:    
         with open('./index.html', 'rb') as f:
-            st.download_button('Documentação', f, file_name='instructions.html')
+            st.download_button('Baixar', f, file_name='data.html')
     except ValueError:
         st.write("Erro") 
