@@ -7,6 +7,7 @@ from PIL import Image
 from sympy import pi, symbols
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
 import copy
 
 x = symbols("x")
@@ -218,14 +219,17 @@ ax.tick_params(axis='y', colors=axes_color)
 ax.tick_params(axis='z', colors=axes_color)
 
 with col1:
-    st.header("Vista geral")
-    st.write("A estrutura mostrada apresenta {} nós e {} elementos".format(len(points), len(elements)))
-
-    elevation = st.slider('Elevação', 0, 180, 40)
-    azimuth = st.slider('Azimute', 0, 360, 225)
+    elevation = st.slider('Elevação', 90, 180, 90)
+    azimuth = st.slider('Azimute', 0, 360, 270)
+    scale_x = st.slider('Escala em x', 0, 10, 1, key='sc_x1')
+    scale_y = st.slider('Escala em y', 0, 10, 1, key='sc_y1')
+    scale_z = st.slider('Escala em z', 0, 10, 1, key='sc_z1')
     
     ax.view_init(elevation, azimuth)
 with col2:
+    st.header("Vista geral")
+    st.write("A estrutura mostrada apresenta {} nós e {} elementos".format(len(points), len(elements)))
+    ax.set_box_aspect((scale_x, scale_y, scale_z))
     for i in range(len(elements)):
         xs, ys, zs = zip(elements[i][0], elements[i][1])
         ax.plot(xs, ys, zs, color=color_estrutura, linewidth=2)
@@ -374,6 +378,10 @@ n_elementos_matriz_de_forcas = 3 * len(pontoNo)
 
 forcas = []
 
+st.write("pontoNo", pontoNo)
+
+pontoNoComRestricoes = []
+
 for i in range(len(pontoNo)):
     with st.sidebar.expander("Nó {}".format(i + 1)):
         resposta = st.radio(
@@ -419,7 +427,11 @@ for i in range(len(pontoNo)):
                     key="nr{}".format(i),
                 )
                 forcas.append(['{}{}'.format(n, i + 1), nova_resposta])
+                
+        pontoNoComRestricoes.append([pontoNo[i], resposta])
 
+
+st.write(pontoNoComRestricoes)
 # st.write("new_forcas", forcas)
 forcasFiltradoComUeV = []
 forcasFiltrado = []
@@ -434,14 +446,14 @@ for i in range(int(len(forcas))):
     if type(forcas[i][1]) == float or type(forcas[i][1]) == int:
         forcasFiltrado.append(forcas[i][1])
 
-# st.write("forcasFiltrado", forcasFiltrado)
+st.write("forcasFiltrado", forcasFiltrado)
 ccs = []
 
 for item in forcas:
     if item[1] == 'R':
         ccs.append(forcas.index(item))
 
-# st.write("ccs", ccs)
+st.write("ccs", ccs)
 a = np.delete(listaGlobalNumpy, ccs, axis=1)
 a = np.delete(a, ccs, axis=0)
 
@@ -468,7 +480,7 @@ for i in range(len(forcas)):
         elif forcas[i][0] == deslocamentosComUeV[j][0]:
             forcas[i][1] = deslocamentosComUeV[j][1]
 
-# st.write("forcas (deslocamentos)", forcas)
+st.write("forcas (deslocamentos)", forcas)
 for i in range(0, len(forcas), 1):
     del forcas[i][0]
 
@@ -581,8 +593,8 @@ for i in range(len(newPointsWithRep)):
 # Tensão nos elementos
 
 # ----------------------------------------------------------------------------------------------------
-
 # st.write("newPoints", newPoints)
+
 with st.expander("Gráfico"):
     fig = plt.figure(facecolor='white')
     ax = fig.add_subplot(111, projection="3d")
@@ -602,7 +614,7 @@ with st.expander("Gráfico"):
 
         resposta = st.radio(
             "Gráficos",
-            ('Estrutura', 'Estrutura + Deslocamentos', 'Estrutura + Deslocamentos + Tensões'))
+            ('Estrutura', 'Estrutura + Deslocamentos', 'Estrutura + Deslocamentos + Tensões', 'Restrições'))
         numerar = st.checkbox("Numerar nós")
         numerar_pos_deformacao = st.checkbox("Numerar nós deslocados")
         numerar_elems = st.checkbox("Numerar elementos")
@@ -643,7 +655,7 @@ with st.expander("Gráfico"):
         for i in range(len(newElements)):
             xs, ys, zs = zip(newElements[i][0], newElements[i][1])
             ax.plot(xs, ys, zs, color=color_deformacao, linewidth=Ds[i] * 5)
-    else:
+    elif resposta == 'Estrutura + Deslocamentos + Tensões':
         for k in range(len(elements)):
             xs, ys, zs = zip(elements[k][0], elements[k][1])
             ax.plot(xs, ys, zs, color=(0, 0, 0, .1), linewidth=Ds[k] * 5)
@@ -666,6 +678,45 @@ with st.expander("Gráfico"):
                 ax.plot(xs, ys, zs, color=(0, 0, abs(tensoes[i] / min(tensoes))), linewidth=Ds[i] * 5)
             elif .1 * max(tensoes) > tensoes[i] >= .1 * min(tensoes):
                 ax.plot(xs, ys, zs, color=(0, 1, 0), linewidth=Ds[i] * 5)
+    else:
+        for i in range(len(elements)):
+            xs, ys, zs = zip(elements[i][0], elements[i][1])
+            ax.plot(xs, ys, zs, color=color_estrutura, linewidth=Ds[i] * 5)
+
+        for i in range(len(points)):
+            if pontoNoComRestricoes[i][1] == 'X':
+                ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=20, color='blue')
+            elif pontoNoComRestricoes[i][1] == 'Y':
+                ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=20, color='blue')
+            elif pontoNoComRestricoes[i][1] == 'Z':
+                ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=20, color='blue')
+            elif pontoNoComRestricoes[i][1] == 'XY':
+                ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=20, color='blue')
+            elif pontoNoComRestricoes[i][1] == 'XZ':
+                ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=20, color='magenta')
+            elif pontoNoComRestricoes[i][1] == 'YZ':
+                ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=20, color='blue')
+            elif pontoNoComRestricoes[i][1] == 'XYZ':
+                x1 = points[i][0]
+                x2 = points[i][1]
+                x3 = points[i][2]
+                
+                v = np.array([
+                    [-.3 + x1, -.7 + x2, -.3 + x3], 
+                    [.3 + x1, -.7 + x2, -.3 + x3], 
+                    [.3 + x1, -.7 + x2, .3 + x3],  
+                    [-.3 + x1, -.7 + x2, .3 + x3], 
+                    [0 + x1, 0 + x2, 0 + x3]
+                ])
+
+                # generate list of sides' polygons of our pyramid
+                verts = [ [v[0],v[1],v[4]], [v[0],v[3],v[4]],
+                [v[2],v[1],v[4]], [v[2],v[3],v[4]], [v[0],v[1],v[2],v[3]]]
+                
+                ax.add_collection3d(Poly3DCollection(verts, 
+                facecolors='r', linewidths=.5, edgecolors='r', alpha=0.9))
+            else:
+                ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=5, color=(0, 1, 0))
 
     if numerar:
         for i in range(len(pontoNo)):
@@ -730,7 +781,13 @@ with st.expander("Gráfico"):
 for i in range(len(elements)):
     dados_gerais.append(["Elemento {}".format(int(i + 1)), xp1s[i], xp2s[i], zp1s[i], xp2s[i], yp2s[i], zp2s[i], format(Ls[i], '.2f'), Es[i], Ds[i]])
 
+
+plt.savefig('plot_3D.pdf')
+plt.savefig('plot_3D.svg')
+plt.savefig('plot_3D.jpg')
+
 if st.button('Gerar dados'):
+
     del tensoesTabela[0]
     del deformacoesTabela[0]
     
@@ -837,9 +894,6 @@ if st.button('Gerar dados'):
             st.download_button('Baixar', f, file_name='data.html')
     except ValueError:
         st.write("Erro") 
-        
-plt.savefig('3D_graphic.pdf')
-plt.savefig('3D_graphic.svg')
 
 with st.sidebar.expander("Download do gráfico"):
     resposta = st.radio(
@@ -849,8 +903,8 @@ with st.sidebar.expander("Download do gráfico"):
     index=0
 )  
     if resposta == 'SVG':
-        with open('./3D_graphic.svg', 'rb') as f:
-            st.download_button('Baixar', f, file_name='3D_graphic.svg')
+        with open('./plot_3D.svg', 'rb') as f:
+            st.download_button('Baixar', f, file_name='plot_3D.svg')
     else:
-        with open('./3D_graphic.pdf', 'rb') as f:
-            st.download_button('Baixar', f, file_name='3D_graphic.pdf')
+        with open('./plot_3D.pdf', 'rb') as f:
+            st.download_button('Baixar', f, file_name='plot_3D.pdf')
