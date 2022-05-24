@@ -260,7 +260,59 @@ with st.sidebar.expander("Propriedades dos elementos"):
             key='check_E',
             placeholder='1, 2, 4'
         )
-        novoModuloE = st.number_input("E (MPa)", value=Es[1])
+        option = st.selectbox(
+            'Materiais',
+            (
+                'Estrutural (ASTM-A36)', 
+                'ASTM-A709 Classe 345',
+                'ASTM-A913 Classe 450',
+                'ASTM-A992 Classe 345',
+                'ASTM-A709 Classe 690',
+                'Liga 1100-H14 (99% Al)',
+                'Liga 2014-T6',
+                'Liga 2024-T4',
+                'Liga 5456-H116',
+                'Liga 6061-T6',
+                'Liga 7075-T6'
+             ))
+        
+        propriedades = [
+            [400, 250, 200000000000],
+            [450, 345, 200000000000],
+            [550, 450, 200000000000],
+            [450, 345, 200000000000],
+            [760, 690, 200000000000],
+            [110, 95, 70000000000],
+            [455, 400, 75000000000],
+            [470, 325, 73000000000],
+            [315, 230, 72000000000],
+            [260, 240, 70000000000],
+            [570, 500, 72000000000]
+        ]
+        
+        if option == 'Estrutural (ASTM-A36)':
+            novoModuloE = st.number_input("E (Pa)", value=propriedades[0][2])
+        elif option == 'ASTM-A709 Classe 345':
+            novoModuloE = st.number_input("E (Pa)", value=propriedades[1][2])
+        elif option == 'ASTM-A913 Classe 450':
+            novoModuloE = st.number_input("E (Pa)", value=propriedades[2][2])
+        elif option == 'ASTM-A992 Classe 345':
+            novoModuloE = st.number_input("E (Pa)", value=propriedades[3][2])
+        elif option == 'ASTM-A709 Classe 690':
+            novoModuloE = st.number_input("E (Pa)", value=propriedades[4][2])
+        elif option == 'Liga 1100-H14 (99% Al)':
+            novoModuloE = st.number_input("E (Pa)", value=propriedades[5][2])
+        elif option == 'Liga 2014-T6':
+            novoModuloE = st.number_input("E (Pa)", value=propriedades[6][2])
+        elif option == 'Liga 2024-T4':
+            novoModuloE = st.number_input("E (Pa)", value=propriedades[7][2])
+        elif option == 'Liga 5456-H116':
+            novoModuloE = st.number_input("E (Pa)", value=propriedades[8][2])
+        elif option == 'Liga 6061-T6':
+            novoModuloE = st.number_input("E (Pa)", value=propriedades[9][2])
+        else:
+            novoModuloE = st.number_input("E (Pa)", value=propriedades[10][2])    
+            
 
         for i in range(len(modificarQuaisElementos.split(','))):
             Es[int(modificarQuaisElementos.split(',')[i]) - 1] = novoModuloE
