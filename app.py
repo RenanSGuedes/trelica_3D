@@ -66,8 +66,8 @@ def lerArquivo():
 
         elements.append([[float(xp1), float(yp1), float(zp1)], [float(xp2), float(yp2), float(zp2)]])
         comprimento = ((float(xp2) - float(xp1)) ** 2 +
-                            (float(yp2) - float(yp1)) ** 2 +
-                            (float(zp2) - float(zp1)) ** 2) ** .5
+                        (float(yp2) - float(yp1)) ** 2 +
+                        (float(zp2) - float(zp1)) ** 2) ** .5
 
         cteL = (xp2s[i] - xp1s[i]) / comprimento
         cteM = (yp2s[i] - yp1s[i]) / comprimento
@@ -108,10 +108,59 @@ def lerInputsManuais():
               "zp2",
               key='zp2_{}'.format(i)
             )
-            Ei = st.number_input(
-              "E (MPa)",
-              key='moduloE_{}'.format(i)
+            option = st.selectbox(
+            'Materiais',
+            (
+                'Estrutural (ASTM-A36)', 
+                'ASTM-A709 Classe 345',
+                'ASTM-A913 Classe 450',
+                'ASTM-A992 Classe 345',
+                'ASTM-A709 Classe 690',
+                'Liga 1100-H14 (99% Al)',
+                'Liga 2014-T6',
+                'Liga 2024-T4',
+                'Liga 5456-H116',
+                'Liga 6061-T6',
+                'Liga 7075-T6'
+             ),
+            key='material_option_{}'.format(i)
             )
+            propriedades = [
+                [400, 250, 200000000000],
+                [450, 345, 200000000000],
+                [550, 450, 200000000000],
+                [450, 345, 200000000000],
+                [760, 690, 200000000000],
+                [110, 95, 70000000000],
+                [455, 400, 75000000000],
+                [470, 325, 73000000000],
+                [315, 230, 72000000000],
+                [260, 240, 70000000000],
+                [570, 500, 72000000000]
+            ]
+        
+            if option == 'Estrutural (ASTM-A36)':
+                Ei = st.number_input("E (Pa)", value=propriedades[0][2], key='material_estrutural_{}'.format(i))
+            elif option == 'ASTM-A709 Classe 345':
+                Ei = st.number_input("E (Pa)", value=propriedades[1][2], key='material_709_{}'.format(i))
+            elif option == 'ASTM-A913 Classe 450':
+                Ei = st.number_input("E (Pa)", value=propriedades[2][2], key='material_913_{}'.format(i))
+            elif option == 'ASTM-A992 Classe 345':
+                Ei = st.number_input("E (Pa)", value=propriedades[3][2], key='material_992_{}'.format(i))
+            elif option == 'ASTM-A709 Classe 690':
+                Ei = st.number_input("E (Pa)", value=propriedades[4][2], key='material_709_{}'.format(i))
+            elif option == 'Liga 1100-H14 (99% Al)':
+                Ei = st.number_input("E (Pa)", value=propriedades[5][2], key='material_h14_{}'.format(i))
+            elif option == 'Liga 2014-T6':
+                Ei = st.number_input("E (Pa)", value=propriedades[6][2], key='material_t6_{}'.format(i))
+            elif option == 'Liga 2024-T4':
+                Ei = st.number_input("E (Pa)", value=propriedades[7][2], key='material_t4_{}'.format(i))
+            elif option == 'Liga 5456-H116':
+                Ei = st.number_input("E (Pa)", value=propriedades[8][2], key='material_h116_{}'.format(i))
+            elif option == 'Liga 6061-T6':
+                Ei = st.number_input("E (Pa)", value=propriedades[9][2], key='material_6061_{}'.format(i))
+            else:
+                Ei = st.number_input("E (Pa)", value=propriedades[10][2], key='material_7075_{}'.format(i))
             D = st.number_input(
               "D (m)",
               key='diametro_{}'.format(i)
@@ -221,9 +270,9 @@ ax.tick_params(axis='z', colors=axes_color)
 with col1:
     elevation = st.slider('Elevação', 90, 180, 90)
     azimuth = st.slider('Azimute', 0, 360, 270)
-    scale_x = st.slider('Escala em x', 0, 10, 1, key='sc_x1')
-    scale_y = st.slider('Escala em y', 0, 10, 1, key='sc_y1')
-    scale_z = st.slider('Escala em z', 0, 10, 1, key='sc_z1')
+    scale_x = st.slider('Escala em x', 0.0, 10.0, 1.0, key='sc_x1', step=.25)
+    scale_y = st.slider('Escala em y', 0.0, 10.0, 1.0, key='sc_y1', step=.25)
+    scale_z = st.slider('Escala em z', 0.0, 10.0, 1.0, key='sc_z1', step=.25)
     
     ax.view_init(elevation, azimuth)
 with col2:
@@ -274,7 +323,9 @@ with st.sidebar.expander("Propriedades dos elementos"):
                 'Liga 5456-H116',
                 'Liga 6061-T6',
                 'Liga 7075-T6'
-             ))
+             ),
+            key='material_option_1'
+            )
         
         propriedades = [
             [400, 250, 200000000000],
@@ -646,11 +697,18 @@ for i in range(len(newPointsWithRep)):
 
 # ----------------------------------------------------------------------------------------------------
 # st.write("newPoints", newPoints)
-
+                
 with st.expander("Gráfico"):
     fig = plt.figure(facecolor='white')
     ax = fig.add_subplot(111, projection="3d")
+
+    # ------------------------------------------------------
+    
+    # ------------------------------------------------------
+
+    
     col1, col2, col3, col4, col5 = st.columns(5)
+    
 
     with st.sidebar.expander("Visualização"):
         with col1:
@@ -671,6 +729,8 @@ with st.expander("Gráfico"):
         numerar_pos_deformacao = st.checkbox("Numerar nós deslocados")
         numerar_elems = st.checkbox("Numerar elementos")
         cotas = st.checkbox("Cotas e Grid")
+        rotulos = st.checkbox("Rótulos nos eixos (x, y, z)")
+        
 
         xs_min_max, ys_min_max, zs_min_max = [], [], []
 
@@ -687,11 +747,12 @@ with st.expander("Gráfico"):
         scale_x = st.slider('Escala em x', 0, 10, 1, key='sc_x')        
         scale_y = st.slider('Escala em y', 0, 10, 1, key='sc_y')
         scale_z = st.slider('Escala em z', 0, 10, 1, key='sc_z')
+        escala_barras = st.number_input('Escala das barras', min_value=30)
 
     if resposta == 'Estrutura':
         for i in range(len(elements)):
             xs, ys, zs = zip(elements[i][0], elements[i][1])
-            ax.plot(xs, ys, zs, color=color_estrutura, linewidth=Ds[i] * 5)
+            ax.plot(xs, ys, zs, color=color_estrutura, linewidth=Ds[i] * escala_barras)
 
         for i in range(len(points)):
             ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=10)
@@ -699,14 +760,14 @@ with st.expander("Gráfico"):
     elif resposta == 'Estrutura + Deslocamentos':
         for i in range(len(elements)):
             xs, ys, zs = zip(elements[i][0], elements[i][1])
-            ax.plot(xs, ys, zs, color=(0, 0, 1, .3), linewidth=Ds[i] * 5)
+            ax.plot(xs, ys, zs, color=(0, 0, 1, .3), linewidth=Ds[i] * escala_barras)
 
         for i in range(len(points)):
             ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=5)
 
         for i in range(len(newElements)):
             xs, ys, zs = zip(newElements[i][0], newElements[i][1])
-            ax.plot(xs, ys, zs, color=color_deformacao, linewidth=Ds[i] * 5)
+            ax.plot(xs, ys, zs, color=color_deformacao, linewidth=Ds[i] * escala_barras)
     elif resposta == 'Estrutura + Deslocamentos + Tensões':
         for k in range(len(elements)):
             xs, ys, zs = zip(elements[k][0], elements[k][1])
@@ -725,15 +786,15 @@ with st.expander("Gráfico"):
             ax.legend(handles=[red_patch, green_patch, blue_patch])
 
             if tensoes[i] > .1 * max(tensoes):
-                ax.plot(xs, ys, zs, color=(tensoes[i] / max(tensoes), 0, 0), linewidth=Ds[i] * 5)
+                ax.plot(xs, ys, zs, color=(tensoes[i] / max(tensoes), 0, 0), linewidth=Ds[i] * escala_barras)
             elif tensoes[i] < .1 * min(tensoes):
-                ax.plot(xs, ys, zs, color=(0, 0, abs(tensoes[i] / min(tensoes))), linewidth=Ds[i] * 5)
+                ax.plot(xs, ys, zs, color=(0, 0, abs(tensoes[i] / min(tensoes))), linewidth=Ds[i] * escala_barras)
             elif .1 * max(tensoes) > tensoes[i] >= .1 * min(tensoes):
-                ax.plot(xs, ys, zs, color=(0, 1, 0), linewidth=Ds[i] * 5)
+                ax.plot(xs, ys, zs, color=(0, 1, 0), linewidth=Ds[i] * escala_barras)
     else:
         for i in range(len(elements)):
             xs, ys, zs = zip(elements[i][0], elements[i][1])
-            ax.plot(xs, ys, zs, color=color_estrutura, linewidth=Ds[i] * 5)
+            ax.plot(xs, ys, zs, color=color_estrutura, linewidth=Ds[i] * escala_barras)
 
         for i in range(len(points)):
             if pontoNoComRestricoes[i][1] == 'X':
@@ -753,27 +814,55 @@ with st.expander("Gráfico"):
                 x2 = points[i][1]
                 x3 = points[i][2]
                 
+                u = np.array([
+                    [.5/2 + x1, -.5 + x2, .5/2 + x3],
+                    [-.5/2 + x1, -.5 + x2, .5/2 + x3],
+                    [-.5/2 + x1, -.5 + x2, -.5/2 + x3],
+                    [.5/2 + x1, -.5 + x2, -.5/2 + x3],
+                    [0 + x1, 0 + x2, 0 + x3]
+                ])
+                
                 v = np.array([
-                    [-.3 + x1, -.7 + x2, -.3 + x3], 
-                    [.3 + x1, -.7 + x2, -.3 + x3], 
-                    [.3 + x1, -.7 + x2, .3 + x3],  
-                    [-.3 + x1, -.7 + x2, .3 + x3], 
+                    [-.5 + x1, .5/2 + x2, -.5/2 + x3],
+                    [-.5 + x1, .5/2 + x2, .5/2 + x3],
+                    [-.5 + x1, -.5/2 + x2, .5/2 + x3],
+                    [-.5 + x1, -.5/2 + x2, -.5/2 + x3],
+                    [0 + x1, 0 + x2, 0 + x3]
+                ])
+                
+                w = np.array([
+                    [.5/2 + x1, -.5/2 + x2, -.5 + x3],
+                    [.5/2 + x1, .5/2 + x2, -.5 + x3],
+                    [-.5/2 + x1, .5/2 + x2, -.5 + x3],
+                    [-.5/2 + x1, -.5/2 + x2, -.5 + x3],
                     [0 + x1, 0 + x2, 0 + x3]
                 ])
 
                 # generate list of sides' polygons of our pyramid
-                verts = [ [v[0],v[1],v[4]], [v[0],v[3],v[4]],
+                v_verts = [[v[0],v[1],v[4]], [v[0],v[3],v[4]],
                 [v[2],v[1],v[4]], [v[2],v[3],v[4]], [v[0],v[1],v[2],v[3]]]
                 
-                ax.add_collection3d(Poly3DCollection(verts, 
-                facecolors='r', linewidths=.5, edgecolors='r', alpha=0.9))
+                u_verts = [[u[0],u[1],u[4]], [u[0],u[3],u[4]],
+                [u[2],u[1],u[4]], [u[2],u[3],u[4]], [u[0],u[1],u[2],u[3]]]
+                
+                w_verts = [[w[0],w[1],w[4]], [w[0],w[3],w[4]],
+                [w[2],w[1],w[4]], [w[2],w[3],w[4]], [w[0],w[1],w[2],w[3]]]
+                
+                ax.add_collection3d(Poly3DCollection(v_verts, 
+                facecolors=(0.7, 0, 0), linewidths=.5, edgecolors='r', alpha=0.7))
+                
+                ax.add_collection3d(Poly3DCollection(u_verts, 
+                facecolors=(0, 0, .7), linewidths=.5, edgecolors='b', alpha=0.7))
+                
+                ax.add_collection3d(Poly3DCollection(w_verts, 
+                facecolors=(0, .7, 0), linewidths=.5, edgecolors='g', alpha=0.7))
             else:
                 ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=5, color=(0, 1, 0))
 
     if numerar:
         for i in range(len(pontoNo)):
             ax.text(pontoNo[i][0] + .3, pontoNo[i][1] + .3, pontoNo[i][2] + .3,
-                    "{}".format(i + 1), color='black', ha='left', va='top', size=6)
+                    "{}".format(i + 1), color='black', ha='left', va='top', size=5)
 
     # Numerando os elementos
     mid_point_new_elements = []
@@ -801,9 +890,11 @@ with st.expander("Gráfico"):
     ax.set_ylim(min(ys_min_max) - 1, max(ys_min_max) + 1)
     ax.set_zlim(min(zs_min_max) - 1, max(zs_min_max) + 1)
     ax.set_box_aspect((scale_x, scale_y, scale_z))
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
-    ax.set_zlabel("z")
+    
+    if rotulos:
+        ax.set_xlabel("x")
+        ax.set_ylabel("y")
+        ax.set_zlabel("z")
 
     if not cotas:
         ax.set_yticks([])
