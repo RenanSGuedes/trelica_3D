@@ -462,7 +462,7 @@ for j in range(len(indicesElementos)):
                 indices[j].append(item)
 
 for k in range(len(lista)):
-    for (newItem, i) in zip(indices[k], range(0, 6, 1)):
+    for (newItem, i) in zip(indices[k], range(0, 6, 1)):    
         for (item, j) in zip(indices[k], range(0, 6, 1)):
             listaGlobal[newItem][item] += lista[k][i][j]
 
@@ -481,7 +481,7 @@ n_elementos_matriz_de_forcas = 3 * len(pontoNo)
 
 forcas = []
 
-st.write("pontoNo", pontoNo)
+# st.write("pontoNo", pontoNo)
 
 pontoNoComRestricoes = []
 
@@ -534,7 +534,7 @@ for i in range(len(pontoNo)):
         pontoNoComRestricoes.append([pontoNo[i], resposta])
 
 
-st.write(pontoNoComRestricoes)
+# st.write(pontoNoComRestricoes)
 # st.write("new_forcas", forcas)
 forcasFiltradoComUeV = []
 forcasFiltrado = []
@@ -549,32 +549,26 @@ for i in range(int(len(forcas))):
     if type(forcas[i][1]) == float or type(forcas[i][1]) == int:
         forcasFiltrado.append(forcas[i][1])
 
-st.write("forcasFiltrado", forcasFiltrado)
+# st.write("forcasFiltrado", forcasFiltrado)
 ccs = []
 
 for item in forcas:
     if item[1] == 'R':
         ccs.append(forcas.index(item))
 
-st.write("ccs", ccs)
 a = np.delete(listaGlobalNumpy, ccs, axis=1)
 a = np.delete(a, ccs, axis=0)
 
-# st.write("a", a)
-# st.write("forcas", forcas)
 
 numpyListInverse = np.linalg.inv(a)
 
 deslocamentosNumpy = np.matmul(numpyListInverse, forcasFiltrado)
-# st.write("deslocamentosNumpy", deslocamentosNumpy)
 
 deslocamentosArray = deslocamentosNumpy.tolist()
 deslocamentosComUeV = []
 
 for i in range(len(forcasFiltradoComUeV)):
     deslocamentosComUeV.append(('{}'.format(forcasFiltradoComUeV[i][0]), deslocamentosArray[i]))
-
-# st.write("deslocamentosComUeV", deslocamentosComUeV)
 
 for i in range(len(forcas)):
     for j in range(len(deslocamentosComUeV)):
@@ -583,7 +577,6 @@ for i in range(len(forcas)):
         elif forcas[i][0] == deslocamentosComUeV[j][0]:
             forcas[i][1] = deslocamentosComUeV[j][1]
 
-st.write("forcas (deslocamentos)", forcas)
 for i in range(0, len(forcas), 1):
     del forcas[i][0]
 
@@ -596,16 +589,12 @@ col1, col2 = st.columns(2)
 
 containerDeslocamentos = st.container()
 
-# st.write("deslocamentosAgrupados", deslocamentosAgrupados)
-
 deslocamentosConfiguradosParaATabela = copy.deepcopy(deslocamentosAgrupados)  # Qdo é "R"
 
 for i in range(len(deslocamentosAgrupados)):
     for j in range(1, 4, 1):
         if deslocamentosConfiguradosParaATabela[i][j] == "R":
             deslocamentosConfiguradosParaATabela[i][j] = 0
-
-# st.write(deslocamentosConfiguradosParaATabela)
 
 deslocamentosAgrupadosTabela = []
 with containerDeslocamentos.expander("Deslocamentos"):
@@ -620,7 +609,6 @@ with containerDeslocamentos.expander("Deslocamentos"):
         )
     st.write(np.array(deslocamentosAgrupadosTabela))
 
-    # (deslocamentosAgrupados)
 newElements = copy.deepcopy(elementsComNos)
 
 for i in range(len(newElements)):
@@ -760,7 +748,7 @@ with st.expander("Gráfico"):
     elif resposta == 'Estrutura + Deslocamentos':
         for i in range(len(elements)):
             xs, ys, zs = zip(elements[i][0], elements[i][1])
-            ax.plot(xs, ys, zs, color=(0, 0, 1, .3), linewidth=Ds[i] * escala_barras)
+            ax.plot(xs, ys, zs, color=(0, 0, 1, .1), linewidth=Ds[i] * escala_barras)
 
         for i in range(len(points)):
             ax.scatter(float(points[i][0]), float(points[i][1]), points[i][2], s=5)
@@ -781,7 +769,7 @@ with st.expander("Gráfico"):
             blue_patch = mpatches.Patch(color='blue', label='Maior compressão')
 
             for j in range(len(newPoints)):
-                ax.scatter(float(newPoints[j][0]), float(newPoints[j][1]), newPoints[j][2], s=10)
+                ax.scatter(float(newPoints[j][0]), float(newPoints[j][1]), newPoints[j][2], s=2, color='yellow')
 
             ax.legend(handles=[red_patch, green_patch, blue_patch])
 
@@ -911,9 +899,9 @@ with st.expander("Gráfico"):
     ax.yaxis.label.set_color(axes_color)
     ax.zaxis.label.set_color(axes_color)
 
-    ax.tick_params(axis='x', colors=axes_color)  # setting up X-axis tick color to red
-    ax.tick_params(axis='y', colors=axes_color)
-    ax.tick_params(axis='z', colors=axes_color)
+    ax.tick_params(axis='x', colors=axes_color, labelsize=5)  # setting up X-axis tick color to red
+    ax.tick_params(axis='y', colors=axes_color, labelsize=5)
+    ax.tick_params(axis='z', colors=axes_color, labelsize=5)
 
     ax.view_init(elevation, azimuth)
 

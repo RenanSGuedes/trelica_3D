@@ -2,9 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5b50d3bf-ba7c-447c-b73c-95fd7a67a155" name="Changes" comment="Sidebar (Exemplos) 🍓">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test2.py" beforeDir="false" afterPath="$PROJECT_DIR$/test2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plot_3D.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/plot_3D.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plot_3D.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/plot_3D.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plot_3D.svg" beforeDir="false" afterPath="$PROJECT_DIR$/plot_3D.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scratch1.py" beforeDir="false" afterPath="$PROJECT_DIR$/scratch1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scratch5.py" beforeDir="false" afterPath="$PROJECT_DIR$/scratch5.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +32,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../python_fem" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -40,6 +45,7 @@
       <workItem from="1652998128503" duration="22114000" />
       <workItem from="1653157607775" duration="2266000" />
       <workItem from="1653220529503" duration="296000" />
+      <workItem from="1653925957037" duration="76000" />
     </task>
     <task id="LOCAL-00001" summary="Gráfico da estrutura no início :ok_hand:">
       <created>1653059951665</created>

@@ -1,9 +1,14 @@
-def listaVazia():
-    global listaNova
-    listaNova = []
-    return listaNova
+import random
 
+print(random.random())
 
-listaVazia()
+linha = []
 
-print(listaNova)
+for i in range(100):
+    linha.append([])
+
+for i in range(100):
+    for j in range(100):
+        linha[j].append(random.random())
+        
+print(linha)
