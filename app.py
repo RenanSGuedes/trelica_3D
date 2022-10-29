@@ -31,7 +31,7 @@ def lerArquivo():
         if file is not None:
             return pd.read_csv(file)
         else:
-            return st.write('Hello')
+            return st.error(body='This is an error')
 
     pandasToPythonList = readCSVFile(uploaded_file).values.tolist()
 
@@ -602,9 +602,9 @@ with containerDeslocamentos.expander("Deslocamentos"):
     for i in range(len(deslocamentosConfiguradosParaATabela)):
         deslocamentosAgrupadosTabela.append(
             ["Nó {}".format(i + 1),
-                format(deslocamentosConfiguradosParaATabela[i][1], ".4f"),
-                format(deslocamentosConfiguradosParaATabela[i][2], ".4f"),
-                format(deslocamentosConfiguradosParaATabela[i][3], ".4f")
+                format(deslocamentosConfiguradosParaATabela[i][1], ".2e"),
+                format(deslocamentosConfiguradosParaATabela[i][2], ".2e"),
+                format(deslocamentosConfiguradosParaATabela[i][3], ".2e")
                 ]
         )
     st.write(np.array(deslocamentosAgrupadosTabela))
@@ -645,9 +645,9 @@ deformacoesTabela = []
 with st.expander("Deformações"):
     deformacoesTabela.append(["Elemento", "%"])
     for i in range(len(deformacoes)):
-        deformacoesTabela.append(["Elemento {}".format(i + 1),
-                                    format(deformacoes[i] * 100,
-                                            '.{}f'.format(4))
+        deformacoesTabela.append(["{}".format(i + 1),
+                                    format(deformacoes[i],
+                                            '.{}e'.format(2))
                                     ])
 
     st.write(np.array(deformacoesTabela))
@@ -662,12 +662,16 @@ tensoesTabela = []
 with st.expander("Tensões"):
     tensoesTabela.append(["Elemento", "MPa"])
     for i in range(len(tensoes)):
-        tensoesTabela.append(["Elemento {}".format(i + 1),
+        tensoesTabela.append(["{}".format(i + 1),
                                 format(tensoes[i] * 10 ** (-6),
-                                        '.{}f'.format(4))
+                                        '.{}e'.format(2))
                                 ])
 
     st.write(np.array(tensoesTabela))
+    
+ltotal = 0
+for item in Ls:
+    ltotal += item 
 
 newPointsWithRep = copy.deepcopy(newElements)
 
@@ -910,22 +914,26 @@ with st.expander("Gráfico"):
 # Insere os dados de cada elemento
 
 for i in range(len(elements)):
-    dados_gerais.append(["Elemento {}".format(int(i + 1)), xp1s[i], xp2s[i], zp1s[i], xp2s[i], yp2s[i], zp2s[i], format(Ls[i], '.2f'), Es[i], Ds[i]])
+    dados_gerais.append(["{}".format(int(i + 1)), xp1s[i], xp2s[i], zp1s[i], xp2s[i], yp2s[i], zp2s[i], format(Ls[i], '.2e'), format(Es[i], '.2e'), format(Ds[i], '.2e')])
 
 
 plt.savefig('plot_3D.pdf')
 plt.savefig('plot_3D.svg')
 plt.savefig('plot_3D.jpg')
 
+deslocamentosNotacao = []
+for i in range(len(deslocamentosAgrupados)):
+    deslocamentosNotacao.append(['{}'.format(i + 1), format(deslocamentosAgrupados[i][1], '.2e'), format(deslocamentosAgrupados[i][2], '.2e'), format(deslocamentosAgrupados[i][3], '.2e')])
+
 if st.button('Gerar dados'):
 
     del tensoesTabela[0]
     del deformacoesTabela[0]
     
-    df_gerais = pd.DataFrame(np.array(dados_gerais), columns=['Elemento', 'x(p1) (m)', 'y(p1) (m)', 'z(p1) (m)', 'x(p2) (m)', 'y(p2) (m)', 'z(p2) (m)', 'L (m)', 'Ei (MPa)', 'D (m)'])
-    df_deslocamentos = pd.DataFrame(np.array(deslocamentosAgrupados), columns = ['Elemento', 'u (m)', 'v (m)', 'w (m)'])
-    df_tensoes = pd.DataFrame(np.array(tensoesTabela), columns = ['Elemento', 'Sigma (MPa)'])
-    df_deformacoes = pd.DataFrame(np.array(deformacoesTabela), columns = ['Elemento', 'Epsilon (%)'])
+    df_gerais = pd.DataFrame(np.array(dados_gerais), columns=['Elem.', 'x(p1) (m)', 'y(p1) (m)', 'z(p1) (m)', 'x(p2) (m)', 'y(p2) (m)', 'z(p2) (m)', 'L (m)', 'Ei (Pa)', 'D (m)'])
+    df_deslocamentos = pd.DataFrame(np.array(deslocamentosNotacao), columns = ['Elem.', 'u (m)', 'v (m)', 'w (m)'])
+    df_tensoes = pd.DataFrame(np.array(tensoesTabela), columns = ['Elem.', 'Sigma (MPa)'])
+    df_deformacoes = pd.DataFrame(np.array(deformacoesTabela), columns = ['Elem.', 'Epsilon (%)'])
     
     gerais_html = df_gerais.to_html()
     deslocamentos_html = df_deslocamentos.to_html()
@@ -954,23 +962,10 @@ if st.button('Gerar dados'):
                 font-family: 'Open Sans', sans-serif;
                 width: 100%;
                 height: 100vh;
-                background: linear-gradient(125deg, aqua, #ff5f5f, rgb(208, 239, 225), violet);
-                background-size: 400% 400%;
-                animation: bgColors 15s infinite;
+                background-color: #7159c1;
                 padding: 20px;
             {'}'}
-            @keyframes bgColors {'{'}
-                0% {'{'}
-                    background-position: 0 50%;
-                {'}'}
-                50% {'{'}
-                    background-position: 100% 50%;
-                {'}'}
-                100% {'{'}
-                    background-position: 0 50%;
-                {'}'}
-            {'}'}
-                table {'{'}
+            table {'{'}
                 background: #012B39;
                 border-radius: 0.25em;
                 border-collapse: collapse;
@@ -1006,14 +1001,17 @@ if st.button('Gerar dados'):
     <body>
         <h1>Informa&#231;&#245;es dos elementos</h1>
         {gerais_html}
+        <h2>Comprimento total de barras: {format(ltotal, '.2e')} m</h2>
         <h1>Deslocamentos nodais</h1>
         {deslocamentos_html}
         <h1>Tens&#245;es por elemento</h1>
         {tensoes_html}
-        <h2>Tens&#227;o m&#225;xima de tra&#231;&#227;o: {format(max(tensoes)*10**(-6), '.4f')} MPa</h2>
-        <h2>Tens&#227;o m&#225;xima de compress&#227;o: {format(min(tensoes)*10**(-6), '.4f')} MPa</h2>
+        <h2>Tens&#227;o m&#225;xima de tra&#231;&#227;o: {format(max(tensoes)*10**(-6), '.2e')} MPa</h2>
+        <h2>Tens&#227;o m&#225;xima de compress&#227;o: {format(min(tensoes)*10**(-6), '.2e')} MPa</h2>
         <h1>Deforma&#231;&#245;es</h1>
         {deformacoes_html}
+        <h2>Alongamento m&#225;ximo: {format(max(deformacoes), '.2e')}</h2>
+        <h2>Encurtamento m&#225;ximo: {format(min(deformacoes), '.2e')}</h2>
     </body>
     </html>
     ''')
